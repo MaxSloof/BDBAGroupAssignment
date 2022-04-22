@@ -1,5 +1,3 @@
-## Test
-
 library(readr)
 library(dplyr)
 library(lubridate)
@@ -30,10 +28,15 @@ for (i in 1:nrow(casesData)) {
 } 
 
 # Transform to per figures per month
-casesDataMonth <- casesData %>% group_by(year, month, country) %>% summarise(new_cases_per_million = sum(new_cases_per_million), 
+casesDataClean <- casesData %>% group_by(year, month, country) %>% summarise(new_cases_per_million = sum(new_cases_per_million), 
                                                                              icu_patients_per_million = mean(icu_patients_per_million))
-casesDataMonth <- arrange(.data = casesDataMonth, country, year, month)
+casesDataClean <- arrange(.data = casesDataClean, country, year, month)
 
 # Replace null with 0
-casesDataMonth$new_cases_per_million[is.na(casesDataMonth$new_cases_per_million)] <- 0
-casesDataMonth$icu_patients_per_million[is.na(casesDataMonth$icu_patients_per_million)] <- 0
+casesDataClean$new_cases_per_million[is.na(casesDataClean$new_cases_per_million)] <- 0
+casesDataClean$icu_patients_per_million[is.na(casesDataClean$icu_patients_per_million)] <- 0
+
+casesDataClean <- casesDataClean[c("country", "year", "month", "new_cases_per_million", "icu_patients_per_million")]
+
+casesDataClean$year <- as.double(casesDataClean$year)
+casesDataClean$month <- as.double(casesDataClean$month)
