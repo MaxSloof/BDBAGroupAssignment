@@ -1,4 +1,5 @@
 library(readr)
+library(dplyr)
 
 oxData <- read.csv("oxData.csv")
 countryCodes <- read_csv("countryCodes.csv")
@@ -11,3 +12,10 @@ regData <- oxData %>% filter(CountryCode %in% vacCountry)
 
 remove(oxData)
 
+# Checken wat C enzo allemaal betekent
+
+# Alle measure-variabelen (c1, c2, enz) omzetten naar gemiddelde per maand
+
+# Gemiddelden nemen van alle Cs / Hs enz
+
+# Kleurcode --> zeggen in meeting
