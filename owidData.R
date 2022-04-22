@@ -18,7 +18,7 @@ colnames(casesData)[1] <- "country"
 
 # Pick what columns we want in the dataset
 colnames(casesData)
-subCasesCols <- c("country", "date", "total_cases_per_million", "icu_patients_per_million")
+subCasesCols <- c("country", "date", "new_cases_per_million", "icu_patients_per_million")
 casesData <- casesData[subCasesCols]
 
 # Transform the Year-Week notation into Year and Month
@@ -28,9 +28,10 @@ for (i in 1:nrow(casesData)) {
 } 
 
 # Transform to per figures per month
-casesDataMonth <- casesData %>% group_by(year, month, country) %>% summarise(total_cases_per_million = max(total_cases_per_million), icu_patients_per_million = max(icu_patients_per_million))
+casesDataMonth <- casesData %>% group_by(year, month, country) %>% summarise(new_cases_per_million = sum(new_cases_per_million), 
+                                                                             icu_patients_per_million = mean(icu_patients_per_million))
 casesDataMonth <- arrange(.data = casesDataMonth, country, year, month)
 
 # Replace null with 0
-casesDataMonth$total_cases_per_million[is.na(casesDataMonth$total_cases_per_million)] <- 0
+casesDataMonth$new_cases_per_million[is.na(casesDataMonth$new_cases_per_million)] <- 0
 casesDataMonth$icu_patients_per_million[is.na(casesDataMonth$icu_patients_per_million)] <- 0
