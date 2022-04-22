@@ -15,10 +15,7 @@ df[is.na(df)] <- 0
 #   Change cases_cat to the name of the new cat.var you want to create
 # 
 
-
-for (i in 1:nrow(df)) {
-  temp_var = df$new_cases_per_million * (1 - 0.7 * (df$vacRateFirstDose/100))
-}
+temp_var = df$new_cases_per_million * (1 - 0.7 * (df$vacRateFirstDose/100))
 
 summary(temp_var)
 boxplot(temp_var)
