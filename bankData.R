@@ -75,9 +75,9 @@ for (i in 1:length(bankCountries)) {
   # Store the unemployment rate for January 2020 per country
   bankRate <- bankClean$bankruptcy[baseDate + Cntry1 - 1]
   
-  # Calculate the difference in unemp. rate compared to baseline for every observation per country
+  # Calculate the difference in unemp. rate compared to baseline for every observation per country as a PERCENTAGE
   for (j in Cntry1:Cntry2) {
-    bankClean$adjBankRate[j] <- bankClean$bankruptcy[j] - bankRate
+    bankClean$adjBankRate[j] <- (bankClean$bankruptcy[j] - bankRate) / bankRate
   }
 }
 
