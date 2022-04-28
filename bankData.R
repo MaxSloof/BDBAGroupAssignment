@@ -81,6 +81,11 @@ for (i in 1:length(bankCountries)) {
   }
 }
 
+# Remove NA values (e.g. there is no data for Hungary)
+bankClean <- bankClean[which(!is.na(bankClean$adjBankRate)),]
+bankClean$country <- factor(bankClean$country)
+bankCountries <- levels(bankClean$country)
+
 # Convert year and month to type double
 bankClean$year <- as.double(bankClean$year)
 bankClean$month <- as.double(bankClean$month)

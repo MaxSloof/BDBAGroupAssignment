@@ -1,10 +1,14 @@
 library(dplyr)
 
+set.seed(123)
+
 # Combine the unemployment, vaccination rate, and COVID cases datasets where rows only in one dataset are still added
 dfPrelim <- full_join(unempDataClean, bankClean[c(1,3,5:7)], by = c('country', 'year', 'month'))
 dfPrelim <- full_join(dfPrelim, vacDataClean, by = c('country', 'year', 'month'))
 dfPrelim <- full_join(dfPrelim, casesDataClean, by = c('country', 'year', 'month'))
 dfPrelim <- full_join(dfPrelim, oxDataClean, by = c('country', 'year', 'month'))
+
+
 dfPrelim <- full_join(dfPrelim, gdpDataClean, by = c('country', 'year', 'month'))
 
 
@@ -19,6 +23,9 @@ df$country <- factor(df$country)
 
 # Remove extremely high values from bankrupcy rate variable
 df <- df[-which(df$adjBankRate > 10),]
+
+# Remove month 3-2022 and 4-2022
+df <- df[which(!(df$year == 2022 & df$month %in% c(3,4))),]
 
 # New cat. variable -------------------------------------------------------
 
@@ -50,7 +57,8 @@ hist(temp_var)
 #   In this case, a large difference is a percentage change of more than 50% from one period compared to jan 2020
 #   A good alternative: max(0 - min(temp_var), max(temp_var)) / 2
 #     This is the largest range between the 0 and the positive or negative side and divide that by 2
-temp_lim <- 0.5 
+
+temp_lim <- 0.25 # 25% increase or decrease is border between small and large difference
 
 
 df$adjBankRate_cat <- as.factor(
@@ -63,20 +71,17 @@ df$adjBankRate_cat <- as.factor(
 
 # Create lag variable -----------------------------------------------------
 
-# Lag of 1 for cases_cat variable
+# Lag of 1 for cases_cat, icu_patients, economicSupport, and containmentHealth variables
 df <- df %>% group_by(country) %>% mutate(lag.cases_cat = dplyr::lag(cases_cat, n = 1, default = NA))
-
-temp_array <- sort(df$adjBankRate, decreasing = FALSE)
-
-hist(temp_array, xlim = c(-1,4), breaks = 1000)
-
-which(temp_array > 10)
+df <- df %>% group_by(country) %>% mutate(lag.icu_patients_per_million = dplyr::lag(icu_patients_per_million, n = 1, default = NA))
+df <- df %>% group_by(country) %>% mutate(lag.economicSupport = dplyr::lag(economicSupport, n = 1, default = NA))
+df <- df %>% group_by(country) %>% mutate(lag.containmentHealth = dplyr::lag(containmentHealth, n = 1, default = NA))
 
 # Model -------------------------------------------------------------------
 
 
 # OLS 
-mdlA <- adjUnemp ~ icu_patients_per_million + cases_cat + adjBankRate
+mdlA <- adjUnemp ~ icu_patients_per_million + cases_cat + adjBankRate + lag.cases_cat
 
 rsltA <- lm(mdlA, dfPrelim)
 
@@ -92,9 +97,15 @@ plot(rsltA)
 # Random Forest
 library(randomForest)
 
-dfSubCols <-c("adjBankRate_cat", "icu_patients_per_million", "cases_cat", "containmentHealth", "economicSupport", "adjUnemp", "ecoSit")
+set.seed(123)
 
-dfSub <- df[dfSubCols]
+dfSubCols <-c("adjBankRate_cat", "icu_patients_per_million", 
+              "cases_cat", "containmentHealth", 
+              "economicSupport", "adjUnemp", 
+              "ecoSit", "lag.cases_cat", "lag.icu_patients_per_million", 
+              "lag.economicSupport", "lag.containmentHealth")
+
+dfSub <- df[which(!(df$year == 2020 & df$month == 1)), dfSubCols]
 
 mdlB <- adjBankRate_cat ~ .
 
