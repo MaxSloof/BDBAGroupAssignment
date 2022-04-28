@@ -81,17 +81,17 @@ df <- df %>% group_by(country) %>% mutate(lag.containmentHealth = dplyr::lag(con
 
 
 # OLS 
-mdlA <- adjUnemp ~ icu_patients_per_million + cases_cat + adjBankRate + lag.cases_cat
+#mdlA <- adjBankRate ~ icu_patients_per_million + cases_cat + adjUnemp + lag.cases_cat
 
-rsltA <- lm(mdlA, dfPrelim)
+#rsltA <- lm(mdlA, dfPrelim)
 
-predA <- predict(rsltA, dfPrelim)
+#predA <- predict(rsltA, dfPrelim)
 
-str(rsltA)
+#str(rsltA)
 
-predA
+#predA
 
-plot(rsltA)
+#plot(rsltA)
 
 
 # Random Forest
